@@ -10,7 +10,7 @@ nltk.download('stopwords')
 from nltk.corpus import stopwords
 
 # Load dataset
-data = pd.read_csv('/Users/srivalli_nalla/Desktop/SE/spread sheet for DIB.csv')
+data = pd.read_csv('spread sheet for DIB.csv')
 print(data.head())
 
 # Converting ratings into sentiment labels (1 = Positive, 0 = Negative)
