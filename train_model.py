@@ -57,8 +57,8 @@ rf_grid.fit(X_train, y_train)
 best_rf_model = rf_grid.best_estimator_
 y_pred_rf = best_rf_model.predict(X_test)
 
-log_reg_results = evaluate_model(y_test, y_pred_log, " Logistic Regression")
-rf_results = evaluate_model(y_test, y_pred_rf, " Random Forest")
+log_reg_results = evaluate_model(y_test, y_pred_log, "Logistic Regression")
+rf_results = evaluate_model(y_test, y_pred_rf, "Random Forest")
 
 # Display Results
 results_df = pd.DataFrame([log_reg_results, rf_results])
