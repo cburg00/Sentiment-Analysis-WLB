@@ -52,3 +52,28 @@ def generate_wordcloud(text, title):
     ax.axis('off')
     ax.set_title(title)
     return fig
+
+def generate_bar_chart_text(df):
+    """Generate a bar chart showing sentiment distribution for text analysis."""
+    counts = df['sentiment'].value_counts()
+    color_mapping = {"Positive": "green", "Neutral": "gray", "Negative": "red"}
+    colors = [color_mapping.get(sentiment, "blue") for sentiment in counts.index]
+    fig, ax = plt.subplots(figsize=(6, 4))
+    ax.bar(counts.index, counts.values, color=colors)
+    ax.set_title("Text Sentiment Distribution - Bar Chart")
+    ax.set_xlabel("Sentiment")
+    ax.set_ylabel("Data Inputs")
+    return fig
+
+def generate_bar_chart_numeric(df):
+    """Generate a bar chart showing sentiment distribution based on numeric ratings."""
+    counts = df['rating_sentiment'].value_counts()
+    color_mapping = {"Positive": "green", "Neutral": "gray", "Negative": "red"}
+    colors = [color_mapping.get(sentiment, "blue") for sentiment in counts.index]
+    fig, ax = plt.subplots(figsize=(6, 4))
+    ax.bar(counts.index, counts.values, color=colors)
+    ax.set_title("Numeric Sentiment Distribution - Bar Chart")
+    ax.set_xlabel("Rating Sentiment")
+    ax.set_ylabel("Data inputs")
+    return fig
+

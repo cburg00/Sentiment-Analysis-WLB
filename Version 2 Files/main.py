@@ -5,7 +5,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from analysis_function import (analyze_sentiment, analyze_numeric_ratings,
                                generate_predefined_summary_numeric, generate_predefined_summary_text)
 from data_visuals import (generate_pie_chart, generate_sentiment_pie_chart, generate_scatter_plot,
-                          generate_sentiment_scatter_plot, generate_wordcloud)
+                          generate_sentiment_scatter_plot, generate_wordcloud,generate_bar_chart_text, generate_bar_chart_numeric)
 
 class SentimentApp(tk.Tk):
     def __init__(self):
@@ -13,7 +13,7 @@ class SentimentApp(tk.Tk):
         self.title("Sentiment Analysis App")
         self.geometry("900x700")
         self.data = None
-        self.word_cloud_message = None
+        self.word_cloud_message = Nonea
         self.create_control_panel()
     
     def create_control_panel(self):
@@ -102,6 +102,7 @@ class SentimentApp(tk.Tk):
             )
             fig_pie = generate_sentiment_pie_chart(self.data)
             fig_scatter = generate_sentiment_scatter_plot(self.data)
+            fig_bar = generate_bar_chart_numeric(self.data)
             self.word_cloud_message = "Data analyzed was numerical, so no word cloud was generated."
             
             sentiment_counts = self.data['rating_sentiment'].value_counts()
@@ -115,6 +116,7 @@ class SentimentApp(tk.Tk):
             self.data['sentiment'], self.data['polarity'] = zip(*self.data[selected_col].apply(analyze_sentiment))
             fig_pie = generate_pie_chart(self.data)
             fig_scatter = generate_scatter_plot(self.data)
+            fig_bar = generate_bar_chart_text(self.data)
             pos_text = ' '.join(self.data[self.data['sentiment'] == 'Positive'][selected_col].dropna().astype(str))
             neg_text = ' '.join(self.data[self.data['sentiment'] == 'Negative'][selected_col].dropna().astype(str))
             self.fig_pos_wc = generate_wordcloud(pos_text, "Positive Word Cloud")
@@ -124,9 +126,9 @@ class SentimentApp(tk.Tk):
             avg_polarity = self.data['polarity'].mean()
             summary = generate_predefined_summary_text(sentiment_counts, avg_polarity)
         
-        self.display_results(fig_pie, fig_scatter, summary)
+        self.display_results(fig_pie, fig_scatter, fig_bar, summary)
     
-    def display_results(self, fig_pie, fig_scatter, summary):
+    def display_results(self, fig_pie, fig_scatter, fig_bar,summary):
         for child in self.notebook.winfo_children():
             child.destroy()
         
@@ -143,6 +145,14 @@ class SentimentApp(tk.Tk):
         canvas2 = FigureCanvasTkAgg(fig_scatter, master=frame_scatter)
         canvas2.draw()
         canvas2.get_tk_widget().pack(fill='both', expand=True)
+
+         # Bar Chart Tab.
+        frame_bar = ttk.Frame(self.notebook)
+        self.notebook.add(frame_bar, text="Bar Chart")
+        canvas_bar = FigureCanvasTkAgg(fig_bar, master=frame_bar)
+        canvas_bar.draw()
+        canvas_bar.get_tk_widget().pack(fill='both', expand=True)
+        
         
         # Word Cloud Tab(s) or Message.
         if self.word_cloud_message:
