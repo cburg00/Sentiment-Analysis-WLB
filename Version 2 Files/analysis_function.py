@@ -1,5 +1,6 @@
 import pandas as pd
 from textblob import TextBlob
+from sklearn.preprocessing import MinMaxScaler
 
 def analyze_sentiment(text):
     """Analyze sentiment using TextBlob and return (sentiment, polarity)."""
@@ -100,3 +101,12 @@ def generate_predefined_summary_text(sentiment_counts, avg_polarity):
     if negative_pct > 30:
         summary += "\n\nNote: Over 30% negative responses indicate deep-rooted dissatisfaction that must be addressed promptly."
     return summary
+
+def scale_numbers(col):
+    scaler = MinMaxScaler(feature_range=(-1,1))
+    is_numeric = pd.api.types.is_numeric_dtype(col)
+    if is_numeric:
+        col_scaled_values = scaler.fit_transform(col.values.reshape(-1,1))
+        col_scaled = pd.DataFrame(col_scaled_values, columns=["data_scaled"], index=col.index)
+        return col_scaled
+    return None

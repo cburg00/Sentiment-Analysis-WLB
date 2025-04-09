@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 import pandas as pd
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from analysis_function import (analyze_sentiment, analyze_numeric_ratings,
-                               generate_predefined_summary_numeric, generate_predefined_summary_text)
+                               generate_predefined_summary_numeric, generate_predefined_summary_text, scale_numbers)
 from data_visuals import (generate_pie_chart, generate_sentiment_pie_chart, generate_scatter_plot,
                           generate_sentiment_scatter_plot, generate_wordcloud,generate_bar_chart_text, generate_bar_chart_numeric)
 
@@ -31,6 +31,11 @@ class SentimentApp(tk.Tk):
         tk.Label(frame, text="Manual Input (one entry per line):").grid(row=2, column=0, columnspan=4, sticky="w")
         self.manual_text = tk.Text(frame, height=5, width=60)
         self.manual_text.grid(row=3, column=0, columnspan=4, pady=5)
+        placeholder_text = "I love my job\nI hate my job"
+        self.add_placeholder(self.manual_text, placeholder_text)
+        
+        self.manual_text.bind("<FocusIn>", lambda event: self.remove_placeholder(self.manual_text, placeholder_text, event))
+        self.manual_text.bind("<FocusOut>", lambda event: self.restore_placeholder(self.manual_text, placeholder_text, event))
         
         tk.Label(frame, text="Select Column for Analysis:").grid(row=4, column=0, sticky="w")
         self.column_combobox = ttk.Combobox(frame, state="readonly")
@@ -70,7 +75,7 @@ class SentimentApp(tk.Tk):
                     messagebox.showerror("Error", f"Failed to load CSV: {e}")
                     return
         elif src == "manual":
-            text_input = self.manual_text.get("1.0", tk.END).strip()
+            text_input = self.manual_text.get("1.0", "end-1c").strip()
             if text_input:
                 lines = text_input.splitlines()
                 self.data = pd.DataFrame({"text": lines})
@@ -93,14 +98,26 @@ class SentimentApp(tk.Tk):
             messagebox.showerror("Error", "Selected column not found.")
             return
         
-        numeric_vals = pd.to_numeric(self.data[selected_col], errors='coerce')
+        col_series = self.data[selected_col].astype(str)
+        #more than 80% of values are percents
+        is_percent = col_series.str.contains('%').mean() > 0.8
+
+        #checks if value is percent. converts to float if true
+        if is_percent:
+            numeric_vals = col_series.str.rstrip('%').astype(float) / 100.0
+        else:
+            numeric_vals = pd.to_numeric(self.data[selected_col], errors='coerce')
+
         numeric_ratio = numeric_vals.notnull().mean()
         
         if numeric_ratio > 0.8:
             self.data['numeric'] = numeric_vals
-            self.data['rating_sentiment'] = self.data['numeric'].apply(
-                lambda x: "Negative" if x <= 2 else ("Neutral" if x == 3 else "Positive")
+            #scales data between -1,1
+            self.data['scaled'] = scale_numbers(numeric_vals)
+            self.data['rating_sentiment'] = self.data['scaled'].apply(
+                lambda x: "Negative" if x <= -0.1 else "Neutral" if x <= 0.1 else "Positive"
             )
+            
             fig_pie = generate_sentiment_pie_chart(self.data)
             fig_scatter = generate_sentiment_scatter_plot(self.data)
             fig_bar = generate_bar_chart_numeric(self.data)
@@ -179,7 +196,6 @@ class SentimentApp(tk.Tk):
             canvas_neg.draw()
             canvas_neg.get_tk_widget().pack(fill='both', expand=True)
             plt.close(self.fig_neg_wc)
-
         
         # Summary Tab.
         frame_sum = ttk.Frame(self.notebook)
@@ -189,6 +205,21 @@ class SentimentApp(tk.Tk):
         text_widget.config(state="disabled")
         text_widget.pack(fill='both', expand=True)
 
+    def add_placeholder(self, manual_text, placeholder_text):
+        manual_text.insert("1.0", placeholder_text)
+        manual_text.tag_add("placeholder", "1.0", "end")
+        manual_text.tag_config("placeholder", foreground="gray")
+        
+    def remove_placeholder(self, manual_text, placeholder_text, event=None):
+        current_text = manual_text.get("1.0", "end-1c")
+        if current_text == placeholder_text:
+            manual_text.delete("1.0", "end")
+            
+    def restore_placeholder(self, manual_text, placeholder_text, event=None):
+        current_text = manual_text.get("1.0", "end-1c").strip()
+        if not current_text:
+            self.add_placeholder(placeholder_text, manual_text)
+    
 if __name__ == "__main__":
     app = SentimentApp()
     app.mainloop()
