@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
+from matplotlib import pyplot as plt
 import pandas as pd
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from analysis_function import (analyze_sentiment, analyze_numeric_ratings,
@@ -13,7 +14,7 @@ class SentimentApp(tk.Tk):
         self.title("Sentiment Analysis App")
         self.geometry("900x700")
         self.data = None
-        self.word_cloud_message = Nonea
+        self.word_cloud_message = None
         self.create_control_panel()
     
     def create_control_panel(self):
@@ -138,6 +139,7 @@ class SentimentApp(tk.Tk):
         canvas1 = FigureCanvasTkAgg(fig_pie, master=frame_pie)
         canvas1.draw()
         canvas1.get_tk_widget().pack(fill='both', expand=True)
+        plt.close(fig_pie)
         
         # Scatter Plot Tab.
         frame_scatter = ttk.Frame(self.notebook)
@@ -145,6 +147,9 @@ class SentimentApp(tk.Tk):
         canvas2 = FigureCanvasTkAgg(fig_scatter, master=frame_scatter)
         canvas2.draw()
         canvas2.get_tk_widget().pack(fill='both', expand=True)
+        plt.close(fig_scatter)
+
+
 
          # Bar Chart Tab.
         frame_bar = ttk.Frame(self.notebook)
@@ -152,6 +157,7 @@ class SentimentApp(tk.Tk):
         canvas_bar = FigureCanvasTkAgg(fig_bar, master=frame_bar)
         canvas_bar.draw()
         canvas_bar.get_tk_widget().pack(fill='both', expand=True)
+        plt.close(fig_bar)
         
         
         # Word Cloud Tab(s) or Message.
@@ -165,12 +171,15 @@ class SentimentApp(tk.Tk):
             canvas_pos = FigureCanvasTkAgg(self.fig_pos_wc, master=frame_pos)
             canvas_pos.draw()
             canvas_pos.get_tk_widget().pack(fill='both', expand=True)
+            plt.close(self.fig_pos_wc)
             
             frame_neg = ttk.Frame(self.notebook)
             self.notebook.add(frame_neg, text="Negative Word Cloud")
             canvas_neg = FigureCanvasTkAgg(self.fig_neg_wc, master=frame_neg)
             canvas_neg.draw()
             canvas_neg.get_tk_widget().pack(fill='both', expand=True)
+            plt.close(self.fig_neg_wc)
+
         
         # Summary Tab.
         frame_sum = ttk.Frame(self.notebook)
