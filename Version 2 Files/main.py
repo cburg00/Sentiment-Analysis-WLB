@@ -218,8 +218,8 @@ class SentimentApp(tk.Tk):
     def restore_placeholder(self, manual_text, placeholder_text, event=None):
         current_text = manual_text.get("1.0", "end-1c").strip()
         if not current_text:
-            self.add_placeholder(placeholder_text, manual_text)
-    
+            self.add_placeholder(manual_text, placeholder_text)
+
 if __name__ == "__main__":
     app = SentimentApp()
     app.mainloop()
