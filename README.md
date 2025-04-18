@@ -1,17 +1,12 @@
-# Sentiment-Analysis-WLB
-This is a project for my software engineering class. Myself and a group of classmates collaborated on this sentiment analysis software that graphically displays overall work/life balance of employees at a company.
+Sentiment Analysis App for Work‑Life Balance
 
-To build a sentiment analysis software, we will follow these key steps:
-    Collect and preprocess text data
-    Convert text into numerical features
-    Train a machine learning model
-    Test and evaluate the model
-    Deploy the model as an API
+A standalone app that helps organizations measure and visualize employee work‑life balance sentiment.
 
-We will use the following libraries:
-    Pandas – Load and process the dataset
-    Scikit-learn – Train and evaluate machine learning models
-    NLTK – Preprocess text (remove stopwords, tokenize)
-    Matplotlib & Seaborn – Data visualization
-    WordCloud – Generate word frequency insights
+Key features:
+- Flexible data sources: load pre‑imported sample data, import any CSV file, or enter free‑form text manually
+- Dual analysis modes:
+    Text reviews: uses TextBlob to classify each entry as Positive, Neutral, or Negative and computes polarity scores
+    Numeric ratings: scales 1–5 work‑life balance scores to a –1 to +1 range and categorizes them into sentiment groups
+- Interactive visualizations: pie charts, scatter plots, bar charts and word clouds all with descriptive captions for quick insight
+- Automated summary: generates a human‑readable narrative highlighting percentages, averages and recommendations
 
